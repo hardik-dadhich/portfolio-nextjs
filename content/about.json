@@ -1,0 +1,121 @@
+{
+  "name": "Hardik Dadhich",
+  "tagline": "Software Engineer & Technology Enthusiast based on USA <-> India",
+  "bio": "I’m a passionate software engineer with 6+ years of experience crafting scalable web applications and designing robust systems. I specialize in backend development, API architecture, and end-to-end infrastructure setup—from scratch to optimization, including databases. Skilled in Python, Java, cloud architecture, and microservices, I bring cutting-edge technology solutions to life. When I’m not coding, you’ll find me sharing tech insights, mentoring aspiring engineers, traveling the world, or sometimes playing my piano as I like to learn new skills.",
+  "interests": [
+    "Web Development",
+    "Cloud Architecture",
+    "Distributed System Development",
+    "Artifical intelligence",
+    "Open Source",
+    "Technical Writing",
+    "Developer Tools",
+    "Exploring Tech Business Ideas"
+  ],
+  "photo": "/assets/images/profile_pic.jpeg",
+  "projects": [
+    {
+      "title": "WIT AI Web Application",
+      "date": "June 2020",
+      "description": "Created Django Web application using Wit.ai under Facebook Hackathon 2020, which answers questions about stocks to buy, sports, and movies in natural language.",
+      "technologies": ["Python", "Django", "React.js", "Django Serializer", "APIs", "PostgreSQL", "Redis Cache"],
+      "github": "https://github.com/hardik-dadhich/Wit-AI",
+      "category": "AI/ML"
+    },
+    {
+      "title": "SPLIT WISE APIs",
+      "date": "June 2021",
+      "description": "Created Splitwise APIs using FastAPI's async model. Built the Create Group, Spend, Expense model, and settlement APIs with proper OpenAPI standard documentation.",
+      "technologies": ["Python", "FastAPI", "Async Programming", "OpenAPI", "REST APIs"],
+      "github": "https://github.com/hardik-dadhich/splitwise-model-using-fastapi",
+      "category": "Backend"
+    },
+    {
+      "title": "Mood Analyser using Watson API",
+      "date": "October 2018",
+      "description": "Created PyQt5 Desktop application in IBM Hack Challenge 2018, which detects the user's mood based on Twitter comments and reactions from the last two days. Recommends movies based on the user's mood.",
+      "technologies": ["Python", "PyQt5", "IBM Watson", "Sentiment Analysis", "IBM DB2", "Twitter API"],
+      "github": "https://github.com/hardik-dadhich/Sentiment_analysis_desktopApp",
+      "category": "AI/ML"
+    }
+  ],
+  "workExperience": [
+    {
+      "title": "SDE-II",
+      "company": "Amazon",
+      "location": "Seattle, USA",
+      "period": "April 2022 - Present",
+      "highlights": [
+        "Optimized RDS database solutions, migrating from provisioned to serverless DB, reducing costs from $250k to $50/month",
+        "Took Responsiblity of all RDS and Infra related activites using AWS Cloudformation and CDK",
+        "Automated ops activities for the team, build multiple guardrails, increasing team credit score from 20 to 70 in 5 months",
+        "Created MCM automation tool used by 1000+ teams, saving 5000+ engineering hours",
+        "Contributed to tier-1 tool for NetScaler LB to AWS ALB migration, impacting Amazon-wide SDO teams"
+      ]
+    },
+    {
+      "title": "SDE",
+      "company": "IBM India Software Labs",
+      "location": "India",
+      "period": "June 2019 - April 2022",
+      "highlights": [
+        "Built API Gateway Microservice using Golang for IBM Cloud AppConfiguration team",
+        "Solved scalability issues by introducing PgBouncer as a service across production regions",
+        "Implemented Istio service mesh to enhance security with mTLS between microservices",
+        "Developed data collector tool and purging microservice using Python, ElasticSearch, Logstash, Kibana (ELK)",
+        "Automated CI/CD pipelines using Tekton/Jenkins with Python and Shell scripts"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "category": "Languages",
+      "items": ["Python", "Java", "Typescript", "ShellScript"]
+    },
+    {
+      "category": "Databases",
+      "items": ["PostgreSQL", "Redis"]
+    },
+    {
+      "category": "Technologies",
+      "items": ["REST", "Django", "FastAPI", "Kafka Event Streams", "SQS", "SNS", "DDB", "S3", "RDS", "VPC tech", "Amazon Apollo tech"]
+    },
+    {
+      "category": "Version Control",
+      "items": ["Git", "GitHub"]
+    },
+    {
+      "category": "Monitoring",
+      "items": ["AWS Cloudwatch", "Prometheus", "IBM Cloud monitoring"]
+    },
+    {
+      "category": "DevOps",
+      "items": ["Kubernetes", "Docker & Containerisation", "CDK", "Lots of Amazon internal technologies", "Good experince on working on L7 layer"]
+    },
+    {
+      "category": "Frameworks",
+      "items": ["Django", "FastAPI", "Spring Boot"]
+    },
+    {
+      "category": "Backend",
+      "items": ["Distributed Systems", "Microservices Architecture", "Gateways", "Ingress-Egress", "ServceMesh"]
+    }
+  ],
+  "socialLinks": [
+    {
+      "platform": "GitHub",
+      "url": "https://github.com/hardik-dadhich",
+      "icon": "github"
+    },
+    {
+      "platform": "LinkedIn",
+      "url": "https://www.linkedin.com/in/hardik-dadhich-4b6003113",
+      "icon": "linkedin"
+    },
+    {
+      "platform": "Email",
+      "url": "mailto:hardikdadhich26@gmail.com",
+      "icon": "email"
+    }
+  ]
+}

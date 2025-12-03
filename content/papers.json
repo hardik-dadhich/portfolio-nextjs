@@ -1,0 +1,53 @@
+{
+  "papers": [
+    {
+      "id": "paper-1",
+      "title": "Optimizing React Performance Through Intelligent Component Memoization",
+      "authors": ["Hardik Dadhich", "Sarah Chen", "Michael Rodriguez"],
+      "venue": "International Conference on Web Technologies (ICWT 2023)",
+      "year": 2023,
+      "summary": "This paper presents a novel approach to automatically identify and optimize React components that would benefit from memoization. Our system analyzes component render patterns and prop dependencies to suggest optimal memoization strategies, resulting in up to 40% performance improvements in real-world applications.",
+      "pdfUrl": "/papers/react-memoization-optimization.pdf",
+      "externalUrl": "https://doi.org/10.1234/icwt.2023.001"
+    },
+    {
+      "id": "paper-2",
+      "title": "A Comparative Study of State Management Solutions in Modern JavaScript Frameworks",
+      "authors": ["Hardik Dadhich", "Emily Watson"],
+      "venue": "Journal of Software Engineering and Applications, Vol. 16, No. 3",
+      "year": 2023,
+      "summary": "We conducted an extensive empirical study comparing popular state management solutions including Redux, MobX, Zustand, and Jotai across multiple dimensions: performance, developer experience, bundle size, and learning curve. Our findings provide evidence-based recommendations for choosing the right state management solution based on application requirements.",
+      "pdfUrl": "/papers/state-management-comparison.pdf",
+      "externalUrl": "https://doi.org/10.1234/jsea.2023.163012"
+    },
+    {
+      "id": "paper-3",
+      "title": "TypeScript Type Inference Patterns for Enhanced Code Safety",
+      "authors": ["Hardik Dadhich", "David Kim", "Lisa Anderson"],
+      "venue": "ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI 2024)",
+      "year": 2024,
+      "summary": "We introduce a set of advanced TypeScript patterns that leverage the type system's inference capabilities to catch more bugs at compile time. Our patterns have been adopted by several large-scale projects and have reduced runtime errors by an average of 35%.",
+      "pdfUrl": "/papers/typescript-inference-patterns.pdf",
+      "externalUrl": "https://doi.org/10.1145/pldi.2024.001"
+    },
+    {
+      "id": "paper-4",
+      "title": "Server Components: A New Paradigm for Web Application Architecture",
+      "authors": ["Hardik Dadhich", "Robert Taylor"],
+      "venue": "IEEE International Conference on Software Architecture (ICSA 2024)",
+      "year": 2024,
+      "summary": "This paper explores the architectural implications of React Server Components and their impact on web application design. We present case studies from production applications and demonstrate how Server Components can reduce client-side JavaScript by up to 60% while improving initial page load times.",
+      "externalUrl": "https://doi.org/10.1109/icsa.2024.001"
+    },
+    {
+      "id": "paper-5",
+      "title": "Automated Testing Strategies for Component-Based Web Applications",
+      "authors": ["Hardik Dadhich", "Jennifer Martinez", "Thomas Brown"],
+      "venue": "International Symposium on Software Testing and Analysis (ISSTA 2022)",
+      "year": 2022,
+      "summary": "We propose a comprehensive testing framework specifically designed for component-based web applications. Our approach combines unit testing, integration testing, and visual regression testing with automated test generation based on component prop types and user interaction patterns.",
+      "pdfUrl": "/papers/automated-testing-strategies.pdf",
+      "externalUrl": "https://doi.org/10.1145/issta.2022.001"
+    }
+  ]
+}

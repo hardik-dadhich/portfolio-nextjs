@@ -1,0 +1,114 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import PaperTable from '@/components/PaperTable';
+import { PaperEntry, PapersResponse } from '@/lib/types';
+
+export default function AccomplishmentPage() {
+  const [papers, setPapers] = useState<PaperEntry[]>([]);
+  const [showArchive, setShowArchive] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPapers = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch 10 recent papers or all papers based on archive toggle
+        const limit = showArchive ? undefined : 10;
+        const url = `/api/papers${limit ? `?limit=${limit}` : ''}`;
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error('Failed to load papers');
+        }
+        
+        const data: PapersResponse = await response.json();
+        
+        setPapers(data.papers);
+        setHasMore(data.hasMore);
+      } catch (err) {
+        console.error('Error fetching papers:', err);
+        setError('Unable to load papers. Please try again later.');
+        toast.error('Failed to load papers');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPapers();
+  }, [showArchive]);
+
+  const handleToggleArchive = () => {
+    setShowArchive(!showArchive);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
+            Papershelf
+          </h1>
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4">
+            A collection of my research papers, publications, and blogs which i read weekly
+          </p>
+        </div>
+
+        {/* Error state */}
+        {error && !loading && (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+              <div className="flex items-start">
+                <svg
+                  className="h-6 w-6 text-red-600 dark:text-red-400 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                    Error loading papers
+                  </h3>
+                  <p className="mt-2 text-sm text-red-700 dark:text-red-300">
+                    {error}
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 dark:text-red-200 bg-red-100 dark:bg-red-900/40 hover:bg-red-200 dark:hover:bg-red-900/60 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    Try again
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Papers table */}
+        {!error && (
+          <PaperTable
+            papers={papers}
+            showArchive={showArchive}
+            onToggleArchive={handleToggleArchive}
+            hasMore={hasMore}
+            isLoading={loading}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
