@@ -52,8 +52,8 @@ export async function GET(request: NextRequest) {
     }
     
     // Fetch papers from database
-    const papers = papersDB.getAllPapers(limit, offset, type);
-    const total = papersDB.getTotalCount(type);
+    const papers = await papersDB.getAllPapers(limit, offset, type);
+    const total = await papersDB.getTotalCount(type);
     
     // Determine if there are more papers
     const hasMore = limit ? (offset + limit) < total : false;
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Create paper in database
-    const paper = papersDB.createPaper(validationResult.data);
+    const paper = await papersDB.createPaper(validationResult.data);
     
     return NextResponse.json(
       { paper },

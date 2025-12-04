@@ -78,7 +78,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
     );
 
     // Fetch all view counts in a single query
-    const viewCounts = blogViewsDB.getAllViewCounts();
+    const viewCounts = await blogViewsDB.getAllViewCounts();
     
     // Map view counts to blog posts by slug
     const postsWithViews = allPostsData.map(post => ({
@@ -127,7 +127,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     const contentHtml = await parseMarkdown(matterResult.content);
 
     // Fetch view count for this post
-    const viewCount = blogViewsDB.getViewCount(slug);
+    const viewCount = await blogViewsDB.getViewCount(slug);
 
     return {
       slug,

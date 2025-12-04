@@ -27,7 +27,7 @@ export async function GET(
     }
     
     // Fetch paper from database
-    const paper = papersDB.getPaperById(id);
+    const paper = await papersDB.getPaperById(id);
     
     if (!paper) {
       return NextResponse.json(
@@ -89,7 +89,7 @@ export async function PUT(
     }
     
     // Check if paper exists
-    const existingPaper = papersDB.getPaperById(id);
+    const existingPaper = await papersDB.getPaperById(id);
     
     if (!existingPaper) {
       return NextResponse.json(
@@ -123,7 +123,7 @@ export async function PUT(
     }
     
     // Update paper in database
-    const paper = papersDB.updatePaper(id, validationResult.data);
+    const paper = await papersDB.updatePaper(id, validationResult.data);
     
     return NextResponse.json(
       { paper },
@@ -188,7 +188,7 @@ export async function DELETE(
     }
     
     // Check if paper exists
-    const existingPaper = papersDB.getPaperById(id);
+    const existingPaper = await papersDB.getPaperById(id);
     
     if (!existingPaper) {
       return NextResponse.json(
@@ -198,7 +198,7 @@ export async function DELETE(
     }
     
     // Delete paper from database
-    const success = papersDB.deletePaper(id);
+    const success = await papersDB.deletePaper(id);
     
     if (!success) {
       return NextResponse.json(

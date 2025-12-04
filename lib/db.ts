@@ -1,39 +1,37 @@
-import Database from 'better-sqlite3';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import type { PaperEntry, PaperFormData, AdminUser } from './types';
-
-const DB_PATH = process.env.DATABASE_URL || join(process.cwd(), 'database', 'blog.db');
-
-// Initialize database connection
-let db: Database.Database | null = null;
-
-function getDatabase(): Database.Database {
-  if (!db) {
-    db = new Database(DB_PATH);
-    db.pragma('journal_mode = WAL');
-    initializeDatabase();
-  }
-  return db;
-}
+import { executeQuery, executeQueryOne, executeUpdate, localDb, db as tursoDb } from './db-client';
 
 // Initialize database schema
-function initializeDatabase() {
-  if (!db) return;
-  
+async function initializeDatabase() {
   const schemaPath = join(process.cwd(), 'database', 'schema.sql');
   const schema = readFileSync(schemaPath, 'utf-8');
   
-  // Execute schema SQL
-  db.exec(schema);
+  // Split schema into individual statements
+  const statements = schema
+    .split(';')
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+  
+  for (const statement of statements) {
+    await executeUpdate(statement + ';');
+  }
+}
+
+// Initialize on first import
+let initialized = false;
+async function ensureInitialized() {
+  if (!initialized) {
+    await initializeDatabase();
+    initialized = true;
+  }
 }
 
 // Papers Database Access Layer
 export class PapersDB {
-  private db: Database.Database;
-
   constructor() {
-    this.db = getDatabase();
+    ensureInitialized();
   }
 
   /**
@@ -43,8 +41,10 @@ export class PapersDB {
    * @param type - Filter by paper type ('paper' or 'blog')
    * @returns Array of paper entries
    */
-  getAllPapers(limit?: number, offset: number = 0, type?: string): PaperEntry[] {
+  async getAllPapers(limit?: number, offset: number = 0, type?: string): Promise<PaperEntry[]> {
     try {
+      await ensureInitialized();
+      
       let query = 'SELECT * FROM papers';
       const params: any[] = [];
 
@@ -60,8 +60,7 @@ export class PapersDB {
         params.push(limit, offset);
       }
 
-      const stmt = this.db.prepare(query);
-      const rows = stmt.all(...params) as any[];
+      const rows = await executeQuery<any>(query, params);
 
       return rows.map(row => ({
         id: row.id,
@@ -85,10 +84,11 @@ export class PapersDB {
    * @param id - Paper ID
    * @returns Paper entry or null if not found
    */
-  getPaperById(id: number): PaperEntry | null {
+  async getPaperById(id: number): Promise<PaperEntry | null> {
     try {
-      const stmt = this.db.prepare('SELECT * FROM papers WHERE id = ?');
-      const row = stmt.get(id) as any;
+      await ensureInitialized();
+      
+      const row = await executeQueryOne<any>('SELECT * FROM papers WHERE id = ?', [id]);
 
       if (!row) return null;
 
@@ -114,23 +114,17 @@ export class PapersDB {
    * @param data - Paper form data
    * @returns Created paper entry
    */
-  createPaper(data: PaperFormData): PaperEntry {
+  async createPaper(data: PaperFormData): Promise<PaperEntry> {
     try {
-      const stmt = this.db.prepare(`
-        INSERT INTO papers (title, authors, date, url, description, type)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `);
-
-      const result = stmt.run(
-        data.title,
-        data.authors,
-        data.date,
-        data.url,
-        data.description || null,
-        data.type
+      await ensureInitialized();
+      
+      const result = await executeUpdate(
+        `INSERT INTO papers (title, authors, date, url, description, type)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [data.title, data.authors, data.date, data.url, data.description || null, data.type]
       );
 
-      const paper = this.getPaperById(result.lastInsertRowid as number);
+      const paper = await this.getPaperById(result.lastInsertRowid!);
       if (!paper) {
         throw new Error('Failed to retrieve created paper');
       }
@@ -148,29 +142,22 @@ export class PapersDB {
    * @param data - Updated paper form data
    * @returns Updated paper entry
    */
-  updatePaper(id: number, data: PaperFormData): PaperEntry {
+  async updatePaper(id: number, data: PaperFormData): Promise<PaperEntry> {
     try {
-      const stmt = this.db.prepare(`
-        UPDATE papers
-        SET title = ?, authors = ?, date = ?, url = ?, description = ?, type = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-      `);
-
-      const result = stmt.run(
-        data.title,
-        data.authors,
-        data.date,
-        data.url,
-        data.description || null,
-        data.type,
-        id
+      await ensureInitialized();
+      
+      const result = await executeUpdate(
+        `UPDATE papers
+         SET title = ?, authors = ?, date = ?, url = ?, description = ?, type = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [data.title, data.authors, data.date, data.url, data.description || null, data.type, id]
       );
 
       if (result.changes === 0) {
         throw new Error('Paper not found');
       }
 
-      const paper = this.getPaperById(id);
+      const paper = await this.getPaperById(id);
       if (!paper) {
         throw new Error('Failed to retrieve updated paper');
       }
@@ -190,10 +177,11 @@ export class PapersDB {
    * @param id - Paper ID
    * @returns True if deleted, false if not found
    */
-  deletePaper(id: number): boolean {
+  async deletePaper(id: number): Promise<boolean> {
     try {
-      const stmt = this.db.prepare('DELETE FROM papers WHERE id = ?');
-      const result = stmt.run(id);
+      await ensureInitialized();
+      
+      const result = await executeUpdate('DELETE FROM papers WHERE id = ?', [id]);
       return result.changes > 0;
     } catch (error) {
       console.error(`Error deleting paper with id ${id}:`, error);
@@ -206,8 +194,10 @@ export class PapersDB {
    * @param type - Filter by paper type ('paper' or 'blog')
    * @returns Total count of papers
    */
-  getTotalCount(type?: string): number {
+  async getTotalCount(type?: string): Promise<number> {
     try {
+      await ensureInitialized();
+      
       let query = 'SELECT COUNT(*) as count FROM papers';
       const params: any[] = [];
 
@@ -216,9 +206,8 @@ export class PapersDB {
         params.push(type);
       }
 
-      const stmt = this.db.prepare(query);
-      const result = stmt.get(...params) as { count: number };
-      return result.count;
+      const result = await executeQueryOne<{ count: number }>(query, params);
+      return result?.count || 0;
     } catch (error) {
       console.error('Error getting paper count:', error);
       throw new Error('Failed to get paper count from database');
@@ -228,10 +217,8 @@ export class PapersDB {
 
 // Admin Database Access Layer
 export class AdminDB {
-  private db: Database.Database;
-
   constructor() {
-    this.db = getDatabase();
+    ensureInitialized();
   }
 
   /**
@@ -239,10 +226,11 @@ export class AdminDB {
    * @param email - Admin user email
    * @returns Admin user with password hash or null if not found
    */
-  getUserByEmail(email: string): (AdminUser & { passwordHash: string }) | null {
+  async getUserByEmail(email: string): Promise<(AdminUser & { passwordHash: string }) | null> {
     try {
-      const stmt = this.db.prepare('SELECT * FROM admin_users WHERE email = ?');
-      const row = stmt.get(email) as any;
+      await ensureInitialized();
+      
+      const row = await executeQueryOne<any>('SELECT * FROM admin_users WHERE email = ?', [email]);
 
       if (!row) return null;
 
@@ -264,17 +252,17 @@ export class AdminDB {
    * @param passwordHash - Hashed password
    * @returns Created admin user
    */
-  createUser(email: string, passwordHash: string): AdminUser {
+  async createUser(email: string, passwordHash: string): Promise<AdminUser> {
     try {
-      const stmt = this.db.prepare(`
-        INSERT INTO admin_users (email, password_hash)
-        VALUES (?, ?)
-      `);
-
-      const result = stmt.run(email, passwordHash);
+      await ensureInitialized();
+      
+      const result = await executeUpdate(
+        `INSERT INTO admin_users (email, password_hash) VALUES (?, ?)`,
+        [email, passwordHash]
+      );
 
       return {
-        id: result.lastInsertRowid as number,
+        id: result.lastInsertRowid!,
         email,
         createdAt: new Date().toISOString(),
       };
@@ -292,10 +280,11 @@ export class AdminDB {
    * Get all admin users (for testing purposes)
    * @returns Array of all admin users
    */
-  getAllUsers(): AdminUser[] {
+  async getAllUsers(): Promise<AdminUser[]> {
     try {
-      const stmt = this.db.prepare('SELECT id, email, created_at FROM admin_users');
-      const rows = stmt.all() as any[];
+      await ensureInitialized();
+      
+      const rows = await executeQuery<any>('SELECT id, email, created_at FROM admin_users');
 
       return rows.map(row => ({
         id: row.id,
@@ -311,10 +300,8 @@ export class AdminDB {
 
 // Blog Views Database Access Layer
 export class BlogViewsDB {
-  private db: Database.Database;
-
   constructor() {
-    this.db = getDatabase();
+    ensureInitialized();
   }
 
   /**
@@ -322,10 +309,14 @@ export class BlogViewsDB {
    * @param slug - Blog post slug
    * @returns View count (0 if not found)
    */
-  getViewCount(slug: string): number {
+  async getViewCount(slug: string): Promise<number> {
     try {
-      const stmt = this.db.prepare('SELECT view_count FROM blog_views WHERE slug = ?');
-      const row = stmt.get(slug) as { view_count: number } | undefined;
+      await ensureInitialized();
+      
+      const row = await executeQueryOne<{ view_count: number }>(
+        'SELECT view_count FROM blog_views WHERE slug = ?',
+        [slug]
+      );
       return row?.view_count || 0;
     } catch (error) {
       console.error(`Error fetching view count for slug ${slug}:`, error);
@@ -339,19 +330,21 @@ export class BlogViewsDB {
    * @param slug - Blog post slug
    * @returns Updated view count
    */
-  incrementViewCount(slug: string): number {
+  async incrementViewCount(slug: string): Promise<number> {
     try {
-      // Use INSERT OR REPLACE for atomic upsert
-      const stmt = this.db.prepare(`
-        INSERT INTO blog_views (slug, view_count, last_viewed_at)
-        VALUES (?, 1, CURRENT_TIMESTAMP)
-        ON CONFLICT(slug) DO UPDATE SET
-          view_count = view_count + 1,
-          last_viewed_at = CURRENT_TIMESTAMP
-      `);
+      await ensureInitialized();
       
-      stmt.run(slug);
-      return this.getViewCount(slug);
+      // Use INSERT OR REPLACE for atomic upsert
+      await executeUpdate(
+        `INSERT INTO blog_views (slug, view_count, last_viewed_at)
+         VALUES (?, 1, CURRENT_TIMESTAMP)
+         ON CONFLICT(slug) DO UPDATE SET
+           view_count = view_count + 1,
+           last_viewed_at = CURRENT_TIMESTAMP`,
+        [slug]
+      );
+      
+      return await this.getViewCount(slug);
     } catch (error) {
       console.error(`Error incrementing view count for slug ${slug}:`, error);
       throw new Error('Failed to increment view count in database');
@@ -362,10 +355,13 @@ export class BlogViewsDB {
    * Get view counts for all blog posts
    * @returns Map of slug to view count
    */
-  getAllViewCounts(): Map<string, number> {
+  async getAllViewCounts(): Promise<Map<string, number>> {
     try {
-      const stmt = this.db.prepare('SELECT slug, view_count FROM blog_views');
-      const rows = stmt.all() as Array<{ slug: string; view_count: number }>;
+      await ensureInitialized();
+      
+      const rows = await executeQuery<{ slug: string; view_count: number }>(
+        'SELECT slug, view_count FROM blog_views'
+      );
       
       const viewCounts = new Map<string, number>();
       rows.forEach(row => {
@@ -384,16 +380,15 @@ export class BlogViewsDB {
    * @param limit - Number of posts to return
    * @returns Array of slugs and view counts
    */
-  getTopViewedPosts(limit: number = 10): Array<{ slug: string; viewCount: number }> {
+  async getTopViewedPosts(limit: number = 10): Promise<Array<{ slug: string; viewCount: number }>> {
     try {
-      const stmt = this.db.prepare(`
-        SELECT slug, view_count
-        FROM blog_views
-        ORDER BY view_count DESC
-        LIMIT ?
-      `);
+      await ensureInitialized();
       
-      const rows = stmt.all(limit) as Array<{ slug: string; view_count: number }>;
+      const rows = await executeQuery<{ slug: string; view_count: number }>(
+        `SELECT slug, view_count FROM blog_views ORDER BY view_count DESC LIMIT ?`,
+        [limit]
+      );
+      
       return rows.map(row => ({ slug: row.slug, viewCount: row.view_count }));
     } catch (error) {
       console.error('Error fetching top viewed posts:', error);
@@ -406,6 +401,3 @@ export class BlogViewsDB {
 export const papersDB = new PapersDB();
 export const adminDB = new AdminDB();
 export const blogViewsDB = new BlogViewsDB();
-
-// Export getDatabase for migration scripts
-export { getDatabase };

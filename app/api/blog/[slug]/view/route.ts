@@ -41,7 +41,7 @@ export async function POST(
     }
 
     // Increment view count using blogViewsDB.incrementViewCount()
-    const newViewCount = blogViewsDB.incrementViewCount(sanitizedSlug);
+    const newViewCount = await blogViewsDB.incrementViewCount(sanitizedSlug);
 
     // Return success response with updated view count
     return NextResponse.json({

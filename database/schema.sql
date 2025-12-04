@@ -31,4 +31,6 @@ CREATE TABLE IF NOT EXISTS blog_views (
 CREATE INDEX IF NOT EXISTS idx_papers_date ON papers(date DESC);
 CREATE INDEX IF NOT EXISTS idx_papers_type ON papers(type);
 CREATE INDEX IF NOT EXISTS idx_papers_created_at ON papers(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_papers_type_date ON papers(type, date DESC);
 CREATE INDEX IF NOT EXISTS idx_blog_views_count ON blog_views(view_count DESC);
+CREATE INDEX IF NOT EXISTS idx_admin_users_email ON admin_users(email);

@@ -44,7 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const { email, password } = validatedCredentials.data;
 
           // Fetch user from database
-          const user = adminDB.getUserByEmail(email);
+          const user = await adminDB.getUserByEmail(email);
           
           if (!user) {
             console.error('User not found:', email);
