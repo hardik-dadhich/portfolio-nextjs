@@ -54,11 +54,12 @@
       "location": "Seattle, USA",
       "period": "April 2022 - Present",
       "highlights": [
-        "Optimized RDS database solutions, migrating from provisioned to serverless DB, reducing costs from $250k to $50/month",
-        "Took Responsiblity of all RDS and Infra related activites using AWS Cloudformation and CDK",
-        "Automated ops activities for the team, build multiple guardrails, increasing team credit score from 20 to 70 in 5 months",
-        "Created MCM automation tool used by 1000+ teams, saving 5000+ engineering hours",
-        "Contributed to tier-1 tool for NetScaler LB to AWS ALB migration, impacting Amazon-wide SDO teams"
+        "Optimized RDS database solution for internal Tax system, migrated from provisioned DB to Aurora serverless DB, reduced cost from $250k/month to $50/month",
+        "Took Responsiblity of all RDS and Infra related activites using Java, AWS CDK, TypeScript, mentored engineers throughout the journey in Region expension goal for service",
+        "Created guardails, multiple APIs, desgined multiple tools and microservices internally to support scale at amazon level to make service peak ready",
+        "Created internal MCM automation tool used by 100+ teams, saved 5000+ engineering hours to automate MCMs execution",
+        "Developed internal tool to audit values for customers to inlines for peak events",
+        "Designed tools and multiple automations for the multiple  internal teams, having strong ownership and bias of action"
       ]
     },
     {
