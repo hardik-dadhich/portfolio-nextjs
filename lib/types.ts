@@ -120,3 +120,33 @@ export interface PapersResponse {
   total: number;
   hasMore: boolean;
 }
+
+// Weekly Reading List Types
+export interface WeeklyReadEntry {
+  id: number;
+  title: string;
+  authors: string;
+  source: string | null;
+  url: string;
+  description: string | null;
+  category: 'research' | 'article' | 'blog' | 'documentation';
+  readDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WeeklyReadFormData {
+  title: string;
+  authors: string;
+  source?: string;
+  url: string;
+  description?: string;
+  category: 'research' | 'article' | 'blog' | 'documentation';
+  readDate: string;
+}
+
+export interface WeeklyReadsResponse {
+  reads: WeeklyReadEntry[];
+  total: number;
+  hasMore: boolean;
+}

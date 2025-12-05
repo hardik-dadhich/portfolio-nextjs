@@ -38,7 +38,7 @@
     { "id": 35, "text": "Learn to dance", "completed": true, "category": "Personal" },
     { "id": 36, "text": "Buy your own name domain", "completed": true, "category": "Projects", "referenceLink": "https://hardikdadhich.com/", "referenceLinkType": "other" },
     { "id": 37, "text": "Learn cybersecurity basics", "completed": true, "category": "Learning" },
-    { "id": 38, "text": "Go on a road trip across the country", "completed": false, "category": "Travel" },
+    { "id": 38, "text": "Go on a road trip across the west coast", "completed": false, "category": "Travel" },
     { "id": 39, "text": "Visit NYC once (dream city)", "completed": true, "category": "Personal" },
     { "id": 40, "text": "Build an AI chatbot", "completed": true, "category": "Projects" },
     { "id": 41, "text": "Learn video editing", "completed": false, "category": "Learning" },
@@ -47,7 +47,7 @@
     { "id": 44, "text": "watch northon lights", "completed": false, "category": "Projects", "referenceLink": "", "referenceLinkType": "medium" },
     { "id": 45, "text": "visit best christman in the world", "completed": false, "category": "Adventure" },
     { "id": 46, "text": "Go camping in the wilderness", "completed": false, "category": "Adventure" },
-    { "id": 47, "text": "Learn to juggle", "completed": false, "category": "Personal" },
+    { "id": 47, "text": "Make health Priority again", "completed": false, "category": "Personal" },
     { "id": 48, "text": "scuba dive in adaman/Great Barrier Reef ", "completed": true, "category": "Projects", "referenceLink": "", "referenceLinkType": "blog" },
     { "id": 49, "text": "Help others as much as I can", "completed": false, "category": "personal" },
     { "id": 50, "text": "Visit New Zealand", "completed": false, "category": "Travel" }

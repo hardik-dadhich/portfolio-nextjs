@@ -27,6 +27,20 @@ CREATE TABLE IF NOT EXISTS blog_views (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Weekly reading list table for papers/articles read weekly
+CREATE TABLE IF NOT EXISTS weekly_reads (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  authors TEXT NOT NULL,
+  source TEXT,
+  url TEXT NOT NULL,
+  description TEXT,
+  category TEXT CHECK(category IN ('research', 'article', 'blog', 'documentation')),
+  read_date DATE NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for optimized queries
 CREATE INDEX IF NOT EXISTS idx_papers_date ON papers(date DESC);
 CREATE INDEX IF NOT EXISTS idx_papers_type ON papers(type);
@@ -34,3 +48,5 @@ CREATE INDEX IF NOT EXISTS idx_papers_created_at ON papers(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_papers_type_date ON papers(type, date DESC);
 CREATE INDEX IF NOT EXISTS idx_blog_views_count ON blog_views(view_count DESC);
 CREATE INDEX IF NOT EXISTS idx_admin_users_email ON admin_users(email);
+CREATE INDEX IF NOT EXISTS idx_weekly_reads_date ON weekly_reads(read_date DESC);
+CREATE INDEX IF NOT EXISTS idx_weekly_reads_category ON weekly_reads(category);

@@ -3,22 +3,27 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import PaperTable from '@/components/PaperTable';
-import { PaperEntry, PapersResponse } from '@/lib/types';
+import WeeklyReadsTable from '@/components/WeeklyReadsTable';
+import { PaperEntry, PapersResponse, WeeklyReadEntry, WeeklyReadsResponse } from '@/lib/types';
 
 export default function AccomplishmentPage() {
   const [papers, setPapers] = useState<PaperEntry[]>([]);
+  const [weeklyReads, setWeeklyReads] = useState<WeeklyReadEntry[]>([]);
   const [showArchive, setShowArchive] = useState(false);
+  const [showReadsArchive, setShowReadsArchive] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  const [hasMoreReads, setHasMoreReads] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [readsLoading, setReadsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch papers (my publications)
   useEffect(() => {
     const fetchPapers = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // Fetch 10 recent papers or all papers based on archive toggle
         const limit = showArchive ? undefined : 10;
         const url = `/api/papers${limit ? `?limit=${limit}` : ''}`;
         
@@ -44,8 +49,42 @@ export default function AccomplishmentPage() {
     fetchPapers();
   }, [showArchive]);
 
+  // Fetch weekly reads
+  useEffect(() => {
+    const fetchWeeklyReads = async () => {
+      try {
+        setReadsLoading(true);
+        
+        const limit = showReadsArchive ? undefined : 10;
+        const url = `/api/weekly-reads${limit ? `?limit=${limit}` : ''}`;
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error('Failed to load weekly reads');
+        }
+        
+        const data: WeeklyReadsResponse = await response.json();
+        
+        setWeeklyReads(data.reads);
+        setHasMoreReads(data.hasMore);
+      } catch (err) {
+        console.error('Error fetching weekly reads:', err);
+        toast.error('Failed to load weekly reads');
+      } finally {
+        setReadsLoading(false);
+      }
+    };
+
+    fetchWeeklyReads();
+  }, [showReadsArchive]);
+
   const handleToggleArchive = () => {
     setShowArchive(!showArchive);
+  };
+
+  const handleToggleReadsArchive = () => {
+    setShowReadsArchive(!showReadsArchive);
   };
 
   return (
@@ -56,13 +95,13 @@ export default function AccomplishmentPage() {
             Papershelf
           </h1>
           <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4">
-            A collection of my research papers, publications, and blogs which i read weekly
+            My research papers, publications, and weekly reading list
           </p>
         </div>
 
         {/* Error state */}
         {error && !loading && (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto mb-8">
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
               <div className="flex items-start">
                 <svg
@@ -70,7 +109,6 @@ export default function AccomplishmentPage() {
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
                     strokeLinecap="round"
@@ -98,16 +136,35 @@ export default function AccomplishmentPage() {
           </div>
         )}
 
-        {/* Papers table */}
+        {/* My Publications Section */}
         {!error && (
-          <PaperTable
-            papers={papers}
-            showArchive={showArchive}
-            onToggleArchive={handleToggleArchive}
-            hasMore={hasMore}
-            isLoading={loading}
-          />
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+              📝 My Publications
+            </h2>
+            <PaperTable
+              papers={papers}
+              showArchive={showArchive}
+              onToggleArchive={handleToggleArchive}
+              hasMore={hasMore}
+              isLoading={loading}
+            />
+          </div>
         )}
+
+        {/* Weekly Reading List Section */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+            📚 Weekly Reading List
+          </h2>
+          <WeeklyReadsTable
+            reads={weeklyReads}
+            showArchive={showReadsArchive}
+            onToggleArchive={handleToggleReadsArchive}
+            hasMore={hasMoreReads}
+            isLoading={readsLoading}
+          />
+        </div>
       </div>
     </div>
   );

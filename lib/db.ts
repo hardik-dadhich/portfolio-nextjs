@@ -397,7 +397,167 @@ export class BlogViewsDB {
   }
 }
 
+// Weekly Reads Database Access Layer
+export class WeeklyReadsDB {
+  constructor() {
+    ensureInitialized();
+  }
+
+  /**
+   * Get all weekly reads with optional pagination
+   */
+  async getAllReads(limit?: number, offset: number = 0): Promise<import('./types').WeeklyReadEntry[]> {
+    try {
+      await ensureInitialized();
+      
+      let query = 'SELECT * FROM weekly_reads ORDER BY read_date DESC, updated_at DESC';
+      const params: any[] = [];
+
+      if (limit) {
+        query += ' LIMIT ? OFFSET ?';
+        params.push(limit, offset);
+      }
+
+      const rows = await executeQuery<any>(query, params);
+
+      return rows.map(row => ({
+        id: row.id,
+        title: row.title,
+        authors: row.authors,
+        source: row.source,
+        url: row.url,
+        description: row.description,
+        category: row.category,
+        readDate: row.read_date,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      }));
+    } catch (error) {
+      console.error('Error fetching weekly reads:', error);
+      throw new Error('Failed to fetch weekly reads from database');
+    }
+  }
+
+  /**
+   * Get a single weekly read by ID
+   */
+  async getReadById(id: number): Promise<import('./types').WeeklyReadEntry | null> {
+    try {
+      await ensureInitialized();
+      
+      const row = await executeQueryOne<any>('SELECT * FROM weekly_reads WHERE id = ?', [id]);
+
+      if (!row) return null;
+
+      return {
+        id: row.id,
+        title: row.title,
+        authors: row.authors,
+        source: row.source,
+        url: row.url,
+        description: row.description,
+        category: row.category,
+        readDate: row.read_date,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      };
+    } catch (error) {
+      console.error(`Error fetching weekly read with id ${id}:`, error);
+      throw new Error('Failed to fetch weekly read from database');
+    }
+  }
+
+  /**
+   * Create a new weekly read entry
+   */
+  async createRead(data: import('./types').WeeklyReadFormData): Promise<import('./types').WeeklyReadEntry> {
+    try {
+      await ensureInitialized();
+      
+      const result = await executeUpdate(
+        `INSERT INTO weekly_reads (title, authors, source, url, description, category, read_date)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [data.title, data.authors, data.source || null, data.url, data.description || null, data.category, data.readDate]
+      );
+
+      const read = await this.getReadById(result.lastInsertRowid!);
+      if (!read) {
+        throw new Error('Failed to retrieve created weekly read');
+      }
+
+      return read;
+    } catch (error) {
+      console.error('Error creating weekly read:', error);
+      throw new Error('Failed to create weekly read in database');
+    }
+  }
+
+  /**
+   * Update an existing weekly read entry
+   */
+  async updateRead(id: number, data: import('./types').WeeklyReadFormData): Promise<import('./types').WeeklyReadEntry> {
+    try {
+      await ensureInitialized();
+      
+      const result = await executeUpdate(
+        `UPDATE weekly_reads
+         SET title = ?, authors = ?, source = ?, url = ?, description = ?, category = ?, read_date = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [data.title, data.authors, data.source || null, data.url, data.description || null, data.category, data.readDate, id]
+      );
+
+      if (result.changes === 0) {
+        throw new Error('Weekly read not found');
+      }
+
+      const read = await this.getReadById(id);
+      if (!read) {
+        throw new Error('Failed to retrieve updated weekly read');
+      }
+
+      return read;
+    } catch (error) {
+      console.error(`Error updating weekly read with id ${id}:`, error);
+      if (error instanceof Error && error.message === 'Weekly read not found') {
+        throw error;
+      }
+      throw new Error('Failed to update weekly read in database');
+    }
+  }
+
+  /**
+   * Delete a weekly read entry
+   */
+  async deleteRead(id: number): Promise<boolean> {
+    try {
+      await ensureInitialized();
+      
+      const result = await executeUpdate('DELETE FROM weekly_reads WHERE id = ?', [id]);
+      return result.changes > 0;
+    } catch (error) {
+      console.error(`Error deleting weekly read with id ${id}:`, error);
+      throw new Error('Failed to delete weekly read from database');
+    }
+  }
+
+  /**
+   * Get total count of weekly reads
+   */
+  async getTotalCount(): Promise<number> {
+    try {
+      await ensureInitialized();
+      
+      const result = await executeQueryOne<{ count: number }>('SELECT COUNT(*) as count FROM weekly_reads');
+      return result?.count || 0;
+    } catch (error) {
+      console.error('Error getting weekly reads count:', error);
+      throw new Error('Failed to get weekly reads count from database');
+    }
+  }
+}
+
 // Export singleton instances
 export const papersDB = new PapersDB();
 export const adminDB = new AdminDB();
 export const blogViewsDB = new BlogViewsDB();
+export const weeklyReadsDB = new WeeklyReadsDB();
