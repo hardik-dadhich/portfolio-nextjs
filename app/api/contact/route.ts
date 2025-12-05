@@ -1,86 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateContactForm, sendContactEmail } from '@/lib/email';
 import { ContactFormData } from '@/lib/types';
+import { contactRateLimiter } from '@/lib/contact-rate-limit';
 
-// Simple in-memory rate limiting
-// In production, use Redis or a proper rate limiting service
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
-const MAX_REQUESTS_PER_WINDOW = 5; // Maximum 5 submissions per hour per IP
-
-/**
- * Check if the request should be rate limited
- */
-function checkRateLimit(identifier: string): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const record = rateLimitMap.get(identifier);
-
-  if (!record || now > record.resetTime) {
-    // Create new record or reset expired one
-    rateLimitMap.set(identifier, {
-      count: 1,
-      resetTime: now + RATE_LIMIT_WINDOW,
-    });
-    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1 };
-  }
-
-  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  // Increment count
-  record.count += 1;
-  rateLimitMap.set(identifier, record);
-
-  return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - record.count };
-}
-
-/**
- * Clean up old rate limit records periodically
- */
-function cleanupRateLimitMap() {
-  const now = Date.now();
-  const keysToDelete: string[] = [];
-  
-  rateLimitMap.forEach((record, key) => {
-    if (now > record.resetTime) {
-      keysToDelete.push(key);
-    }
-  });
-  
-  keysToDelete.forEach(key => rateLimitMap.delete(key));
-}
-
-// Run cleanup every 10 minutes
-setInterval(cleanupRateLimitMap, 10 * 60 * 1000);
+const MAX_SUBMISSIONS = 3;
+const WINDOW_HOURS = 24;
 
 export async function POST(request: NextRequest) {
   try {
-    // Get client identifier (IP address or fallback)
-    const forwarded = request.headers.get('x-forwarded-for');
-    const ip = forwarded ? forwarded.split(',')[0] : 'unknown';
-    
-    // Check rate limit
-    const { allowed, remaining } = checkRateLimit(ip);
-    
-    if (!allowed) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Too many requests. Please try again later.',
-        },
-        { 
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': MAX_REQUESTS_PER_WINDOW.toString(),
-            'X-RateLimit-Remaining': '0',
-          }
-        }
-      );
-    }
-
-    // Parse request body
+    // Parse request body first to get email
     const body = await request.json();
     
     // Validate required fields exist
@@ -101,7 +29,7 @@ export async function POST(request: NextRequest) {
       preferredTime: body.preferredTime || '',
     };
 
-    // Validate form data
+    // Validate form data first
     const validation = validateContactForm(formData);
     
     if (!validation.valid) {
@@ -111,11 +39,25 @@ export async function POST(request: NextRequest) {
           message: 'Validation failed',
           errors: validation.errors,
         },
+        { status: 400 }
+      );
+    }
+
+    // Check rate limit based on email address
+    const rateLimitCheck = await contactRateLimiter.checkRateLimit(formData.email);
+    
+    if (!rateLimitCheck.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: rateLimitCheck.message || `You can only send ${MAX_SUBMISSIONS} messages per ${WINDOW_HOURS} hours. Please try again later.`,
+        },
         { 
-          status: 400,
+          status: 429,
           headers: {
-            'X-RateLimit-Limit': MAX_REQUESTS_PER_WINDOW.toString(),
-            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Limit': MAX_SUBMISSIONS.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitCheck.resetAt?.toISOString() || '',
           }
         }
       );
@@ -133,12 +75,15 @@ export async function POST(request: NextRequest) {
         { 
           status: 500,
           headers: {
-            'X-RateLimit-Limit': MAX_REQUESTS_PER_WINDOW.toString(),
-            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Limit': MAX_SUBMISSIONS.toString(),
+            'X-RateLimit-Remaining': rateLimitCheck.remaining.toString(),
           }
         }
       );
     }
+
+    // Record successful submission
+    await contactRateLimiter.recordSubmission(formData.email);
 
     // Success response
     return NextResponse.json(
@@ -149,8 +94,9 @@ export async function POST(request: NextRequest) {
       { 
         status: 200,
         headers: {
-          'X-RateLimit-Limit': MAX_REQUESTS_PER_WINDOW.toString(),
-          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Limit': MAX_SUBMISSIONS.toString(),
+          'X-RateLimit-Remaining': (rateLimitCheck.remaining - 1).toString(),
+          'X-RateLimit-Reset': rateLimitCheck.resetAt?.toISOString() || '',
         }
       }
     );

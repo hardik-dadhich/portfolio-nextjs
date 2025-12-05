@@ -152,6 +152,35 @@ async function migrateToTurso() {
       console.log(`✅ No weekly reads to migrate\n`);
     }
 
+    // Step 6: Migrate contact rate limit records (if any)
+    console.log('🚦 Migrating rate limit records...');
+    let rateLimitRecords = [];
+    try {
+      rateLimitRecords = localDb.prepare('SELECT * FROM contact_rate_limit').all();
+    } catch (error) {
+      console.log('⚠️  contact_rate_limit table not found in local database (skipping)');
+    }
+    
+    if (rateLimitRecords.length > 0) {
+      for (const record of rateLimitRecords as any[]) {
+        await tursoDb.execute({
+          sql: `INSERT OR REPLACE INTO contact_rate_limit 
+                (email, submission_count, first_submission_at, last_submission_at, window_reset_at) 
+                VALUES (?, ?, ?, ?, ?)`,
+          args: [
+            record.email,
+            record.submission_count,
+            record.first_submission_at,
+            record.last_submission_at,
+            record.window_reset_at,
+          ],
+        });
+      }
+      console.log(`✅ Migrated ${rateLimitRecords.length} rate limit record(s)\n`);
+    } else {
+      console.log(`✅ No rate limit records to migrate\n`);
+    }
+
     // Close connections
     localDb.close();
 

@@ -41,6 +41,15 @@ CREATE TABLE IF NOT EXISTS weekly_reads (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Contact form rate limiting table
+CREATE TABLE IF NOT EXISTS contact_rate_limit (
+  email TEXT PRIMARY KEY,
+  submission_count INTEGER NOT NULL DEFAULT 1,
+  first_submission_at DATETIME NOT NULL,
+  last_submission_at DATETIME NOT NULL,
+  window_reset_at DATETIME NOT NULL
+);
+
 -- Indexes for optimized queries
 CREATE INDEX IF NOT EXISTS idx_papers_date ON papers(date DESC);
 CREATE INDEX IF NOT EXISTS idx_papers_type ON papers(type);
@@ -50,3 +59,4 @@ CREATE INDEX IF NOT EXISTS idx_blog_views_count ON blog_views(view_count DESC);
 CREATE INDEX IF NOT EXISTS idx_admin_users_email ON admin_users(email);
 CREATE INDEX IF NOT EXISTS idx_weekly_reads_date ON weekly_reads(read_date DESC);
 CREATE INDEX IF NOT EXISTS idx_weekly_reads_category ON weekly_reads(category);
+CREATE INDEX IF NOT EXISTS idx_contact_rate_limit_reset ON contact_rate_limit(window_reset_at);
