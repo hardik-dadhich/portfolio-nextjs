@@ -23,7 +23,7 @@ export default async function GoalsPage() {
             100 Things I Want to Do
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
-            A personal bucket list of goals, dreams, and aspirations
+            A personal bucket list of goals, dreams, and aspirations and small things which i have covered
           </p>
           
           {/* Progress Bar */}
