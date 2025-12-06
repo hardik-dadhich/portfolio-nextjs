@@ -16,7 +16,7 @@ export default function Navigation() {
     { href: '/blog', label: 'Blog' },
     { href: '/accomplishment', label: 'Papershelf' },
     { href: '/goals', label: '100 Things I Want to Do' },
-    { href: '/contact', label: 'Join Call/Contact Me' },
+    { href: '/contact', label: 'Contact Me' },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
