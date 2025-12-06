@@ -146,10 +146,36 @@ export default function WeeklyReadsTable({
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Showing {reads.length} {reads.length === 1 ? 'read' : 'reads'}
-          {hasMore && !showArchive && ' (view all to see more)'}
-        </p>
+        {hasMore && !showArchive ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Showing {reads.length} {reads.length === 1 ? 'read' : 'reads'} (view all to see more)
+          </p>
+        ) : !hasMore && showArchive ? (
+          <div className="text-center py-4">
+            <div className="inline-flex flex-col items-center gap-2">
+              <svg
+                className="h-12 w-12 text-gray-400 dark:text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <p className="text-gray-600 dark:text-gray-400 font-medium text-lg">
+                🎉 You've reached the end of the list!
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Showing {reads.length} {reads.length === 1 ? 'read' : 'reads'}
+          </p>
+        )}
       </div>
     </div>
   );

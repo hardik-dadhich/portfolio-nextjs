@@ -16,7 +16,7 @@ export default async function BlogPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Blog</h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Thoughts, tutorials, and insights on web development, technology, and more
+            Thoughts, tutorials, and insights on web development, technology, interview experience and more
           </p>
         </div>
 
