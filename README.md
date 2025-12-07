@@ -1,10 +1,10 @@
-<<<<<<< HEAD
-# portfolio-nextjs
-simple blogging + Portfolio website
-=======
 # Personal Blog Website
 
 A personal blogging website built with Next.js 14, React, TypeScript, and Tailwind CSS.
+Hosted on : https://hardikdadhich.com
+
+# Demo : 
+[portfolio-nextjs-gules-two.vercel.app](https://portfolio-nextjs-gules-two.vercel.app/)
 
 ## Getting Started
 
@@ -75,7 +75,7 @@ personal-blog-website/
 
 ## Features
 
-- About Me page (landing page)
+- About Me page (main landing page)
 - Blog section with markdown posts
 - Research papers showcase (Papershelf)
 - Personal goals list (100 Things I Want to Do)
@@ -83,8 +83,3 @@ personal-blog-website/
 - Fully responsive design
 - SEO optimized
 - Performance optimized
-
-## License
-
-Private
->>>>>>> 03ca12c (Created nextJs setup with DB)
