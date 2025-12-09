@@ -54,7 +54,8 @@
       "location": "Seattle, USA",
       "period": "April 2022 - Present",
       "highlights": [
-        "Architected and executed critical database migration from provisioned RDS to Aurora ServerlessV2, achieving 99.8% cost reduction ($250K/month → $50/month) while maintaining 99.99% uptime for Tax system serving billions of transactions daily",
+        "Working as SDE2 in Amazon TaxCalculation backend team (Retail side), Which handles billions of transaction daily and calculate taxes for all sales trascations on amazon.com plateform",
+        "Architected and executed critical database migration from provisioned RDS to Aurora ServerlessV2, achieving 99.8% cost reduction ($250K/month → $50/month) while maintaining 99.99% uptime for distributed service like Tax system serving billions of transactions daily",
         "Owned end-to-end infrastructure modernization across 16 AWS regions using Java, CDK, and TypeScript—led cross-functional complex region expansion of service",
         "Designed and implemented production guardrails preventing SEV1 incidents, eliminating 100% of scaling-related outages during peak events (Prime Day, Black Friday) serving 200M+ customers",
         "Built enterprise-grade MCM automation platform adopted by 12+ teams across Amazon, eliminating 5,000+ engineering hours annually and reducing deployment time from 4 hours to 15 minutes",
