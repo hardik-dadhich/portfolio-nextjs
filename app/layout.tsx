@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SessionProvider from "@/components/SessionProvider";
 import ToastProvider from "@/components/ToastProvider";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://yourdomain.com",
+    url: "https://hardikdadhich.com/",
     title: "Personal Blog - Hardik Dadhich",
     description: "A personal space for sharing thoughts on software development, technology, and continuous learning.",
     siteName: "Personal Blog",
@@ -58,6 +59,7 @@ export default function RootLayout({
             <Navigation />
             <main className="flex-grow">
               {children}
+              <SpeedInsights />
             </main>
             <Footer />
           </ThemeProvider>
