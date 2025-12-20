@@ -1,3 +1,16 @@
+---
+title: The Hidden Reality of Amazon's Corporate Ladder: Performance vs Politics
+date: '2025-12-19'
+author: Hardik Dadhich
+summary: The Harsh Reality and basically how you can grow in corporate world, tips and tricks.
+tags:
+  - Next.js
+  - TypeScript
+  - corporate
+  - Amazon ladder
+slug: building-nextjs-portfolio
+---
+
 # The Hidden Reality of Amazon's Corporate Ladder: Performance vs Politics
 
 *A candid look at how corporate politics shapes careers at one of the world's largest tech companies*
